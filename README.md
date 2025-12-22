@@ -19,4 +19,4 @@ Tired of minimizing your browser every time a coworker walks by? Lore Vault is a
 
 🛡️ **Privacy Promise:** We don't read your chats. We don't want your data. Lore Vault operates locally on your machine. Your secrets stay between you and your AI.
 
-## Built for dreamers, coders, and anyone avoiding the 'Sky Police'.
+## Built for dreamers, coders, and anyone avoiding the 'Sky Police'🚨!
