@@ -29,7 +29,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 function addMainGemButton() {
   if (document.getElementById('main-gem-button')) return;
 
-  console.log("💎 Lore Vault: Injecting Gem (Claude-safe).");
+  console.log("💎 Lore Vault: Injecting Gem.");
 
   const gemBtn = document.createElement('div');
   gemBtn.id = 'main-gem-button';
@@ -70,7 +70,8 @@ function applyPrivacyShield() {
   // Selectors for the sidebar history area
   const sidebar = document.querySelector('nav') || 
                   document.querySelector('.flex-col.bg-bg-200') ||
-                  document.querySelector('[role="navigation"]');
+                  document.querySelector('[role="navigation"]') ||
+				  document.querySelector('.a2f3d50e');
   
   if (sidebar && !document.getElementById('gem-vault-overlay')) {
     const overlay = document.createElement('div');

@@ -12,7 +12,8 @@
     {
       "matches": [
         "https://chatgpt.com/*",
-        "https://claude.ai/*"
+        "https://claude.ai/*",
+		"https://chat.deepseek.com/"
       ],
       "js": ["content.js"],
 	  "icons": {
