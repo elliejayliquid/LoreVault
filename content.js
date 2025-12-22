@@ -6,10 +6,23 @@ let lastActivity = Date.now();
 console.log("💎 Lore Vault: Content script initialized.");
 
 // LOAD SETTINGS
-chrome.storage.sync.get(['vaultPassword', 'autoLockEnabled', 'lockTimeout'], (data) => {
-  settings.password = data.vaultPassword || "nova";
-  settings.autoLock = data.autoLockEnabled ?? true;
-  settings.timeout = data.lockTimeout || 5;
+chrome.storage.sync.get(
+  ['vaultPassword', 'autoLockEnabled', 'lockTimeout', 'blockNewChatShortcuts'],
+  (data) => {
+    settings.password = data.vaultPassword || "nova";
+    settings.autoLock = data.autoLockEnabled ?? true;
+    settings.timeout = data.lockTimeout || 5;
+    settings.blockNewChatShortcuts = data.blockNewChatShortcuts ?? true; // default on
+  }
+);
+
+// LISTEN FOR REAL-TIME CHANGES (If user changes settings while ChatGPT is open)
+chrome.storage.onChanged.addListener((changes, areaName) => {
+	if (areaName && areaName !== 'sync') return;
+	if (changes.vaultPassword) settings.password = changes.vaultPassword.newValue;
+	if (changes.autoLockEnabled) settings.autoLock = changes.autoLockEnabled.newValue;
+	if (changes.lockTimeout) settings.timeout = changes.lockTimeout.newValue;
+	if (changes.blockNewChatShortcuts) settings.blockNewChatShortcuts = changes.blockNewChatShortcuts.newValue;
 });
 
 // --- 1. THE MAIN GEM BUTTON ---
@@ -117,6 +130,74 @@ function applyPrivacyShield() {
   }
 }
 
+// --- 2.5. KEYBOARD SHORTCUT (CTRL+SHIFT+L) ---
+function toggleVaultHotkey() {
+  if (isLocked) {
+    // Make sure overlay exists, then trigger the same unlock flow
+    applyPrivacyShield();
+
+    const overlay = document.getElementById('gem-vault-overlay');
+    if (overlay) overlay.click(); // calls your existing prompt flow
+  } else {
+    isLocked = true;
+    applyPrivacyShield();
+  }
+}
+
+function installVaultHotkey() {
+  if (window.__loreVaultHotkeyInstalled) return;
+  window.__loreVaultHotkeyInstalled = true;
+
+  window.addEventListener('keydown', (e) => {
+    if (!e.ctrlKey || !e.shiftKey) return;
+
+    const isL = (e.code === 'KeyL') || (typeof e.key === 'string' && e.key.toLowerCase() === 'l');
+    if (!isL) return;
+
+    if (e.repeat) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    toggleVaultHotkey();
+  }, true); // capture=true so the site doesn't eat it first
+}
+
+// --- 2.6. BLOCK SITE SHORTCUTS WHILE LOCKED ---
+function installVaultShortcutBlocker() {
+  if (window.__loreVaultBlockerInstalled) return;
+  window.__loreVaultBlockerInstalled = true;
+
+  window.addEventListener('keydown', (e) => {
+    if (!isLocked) return;
+    if (e.repeat) return;
+	if (!settings.blockNewChatShortcuts) return;
+
+    const k = (e.key || '').toLowerCase();
+    const host = location.hostname;
+
+    // Claude: Ctrl+K
+    if (/claude\.ai/i.test(host)) {
+      if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey && k === 'k') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return;
+      }
+    }
+
+    // ChatGPT: Ctrl+Shift+O
+    if (/chatgpt\.com|chat\.openai\.com/i.test(host)) {
+      if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey && k === 'o') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return;
+      }
+    }
+  }, true); // capture=true so we beat the site listeners
+}
+
 // --- 3. AUTO-LOCK & ACTIVITY TRACKING ---
 function updateActivity() { lastActivity = Date.now(); }
 ['mousemove', 'keydown', 'mousedown', 'touchstart'].forEach(evt => {
@@ -141,3 +222,5 @@ observer.observe(document.body, { childList: true, subtree: true });
 setInterval(checkAutoLock, 10000);
 addMainGemButton();
 applyPrivacyShield();
+installVaultHotkey();
+installVaultShortcutBlocker();
