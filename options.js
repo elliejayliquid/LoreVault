@@ -10,22 +10,16 @@ document.getElementById('save').onclick = () => {
     autoLockEnabled: autoLock,
     lockTimeout: timeout
   }, () => {
-    // Elegant visual feedback instead of a clunky alert
     const originalText = saveBtn.innerText;
-    saveBtn.innerText = "Saved!";
+    saveBtn.innerText = "SAVED!";
     
-    // Switch colors for the "success" state
-    saveBtn.style.backgroundColor = "#00d4ff";
-    saveBtn.style.color = "#050a14";
+    // Switch colors for the "success" state (Glow state)
+    saveBtn.style.boxShadow = "0 0 15px #00d4ff";
     
     setTimeout(() => {
       saveBtn.innerText = originalText;
-      
-      // FIX: Resetting to the specific colors defined in your HTML 
-      // instead of "" which was making it turn into a default gray button.
-      saveBtn.style.backgroundColor = "#00d4ff";
-      saveBtn.style.color = "#0b0e14";
-    }, 2000);
+      saveBtn.style.boxShadow = "none";
+    }, 1000);
   });
 };
 
