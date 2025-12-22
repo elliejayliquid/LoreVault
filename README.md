@@ -1,22 +1,26 @@
-# LoreVault
-Chrome security extension for the most popular LLM providers.
+# Lore Vault
+A Chrome privacy extension for popular LLM providers. Currently supports ChatGPT (OpenAI) and Claude (Anthropic).
 
-# A digital vault for your chat history. Lock your sidebar with a password, auto-lock timer, and sleek visual privacy.
+# A digital vault for your chat history. 
+Lore Vault locks your sidebar history with a password, optional auto-lock timer, and a clean “vault overlay” that hides your chat titles until you unlock.
 
 ## Your patterns. Your secrets. Your vault.
-
 Tired of minimizing your browser every time a coworker walks by? Lore Vault is a privacy extension designed for the power user. It places a sleek overlay over your ChatGPT sidebar, ensuring your chat titles and history remain invisible until you enter your custom access code.
 
 **Why use Lore Vault?**
 
-🏄 **The "Shoulder Surfer" Defense:** Completely blocks the sidebar from view - no one can browse your chats or start new ones without your permission.
+🏄 **The "Shoulder Surfer" Defense:** Hides sidebar history behind a full overlay while locked.
 
-🔐 **Smart Auto-Lock:** Walked away for coffee? The Vault detects inactivity and locks itself automatically.
+🔐 **Smart Auto-Lock:** Walked away for coffee? Locks automatically after inactivity (configurable timeout).
 
-💎 **The Gem Lock:** Features a subtle diamond button in the header - click it to lock the vault instantly.
+💎 **The Gem Lock:** A subtle 💎 button lets you lock instantly.
 
-👮 **Customizable Security:** Set your own password and timeout duration in the easy-to-use Options menu.
+⌨️ **Hotkey Toggle:** **Ctrl + Shift + L** toggles Vault lock/unlock.
 
-🛡️ **Privacy Promise:** We don't read your chats. We don't want your data. Lore Vault operates locally on your machine. Your secrets stay between you and your AI.
+🚫 **Block “New Chat” Shortcuts (optional):** While locked, Lore Vault can intercept provider shortcuts (e.g. “new chat”) to prevent accidental chat creation.
 
-## Built for dreamers, coders, and anyone avoiding the 'Sky Police'🚨!
+👮 **Customizable Security:** Set your password, timeout, and options via the extension’s Options page.
+
+🛡️ **Privacy Promise:** Lore Vault runs locally. It does not read or send your chat content anywhere. Your secrets are between you and your AI.
+
+## Built for dreamers, coders, and anyone avoiding the Sky Police 🚨
