@@ -24,3 +24,5 @@ Tired of minimizing your browser every time a coworker walks by? Lore Vault is a
 🛡️ **Privacy Promise:** Lore Vault runs locally. It does not read or send your chat content anywhere. Your secrets are between you and your AI.
 
 ## Built for dreamers, coders, and anyone avoiding the Sky Police 🚨
+
+<a href='https://ko-fi.com/V7V31EO2OL' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
