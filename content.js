@@ -18,11 +18,11 @@ chrome.storage.sync.get(
 
 // LISTEN FOR REAL-TIME CHANGES (If user changes settings while ChatGPT is open)
 chrome.storage.onChanged.addListener((changes, areaName) => {
-	if (areaName && areaName !== 'sync') return;
-	if (changes.vaultPassword) settings.password = changes.vaultPassword.newValue;
-	if (changes.autoLockEnabled) settings.autoLock = changes.autoLockEnabled.newValue;
-	if (changes.lockTimeout) settings.timeout = changes.lockTimeout.newValue;
-	if (changes.blockNewChatShortcuts) settings.blockNewChatShortcuts = changes.blockNewChatShortcuts.newValue;
+  if (areaName && areaName !== 'sync') return;
+  if (changes.vaultPassword) settings.password = changes.vaultPassword.newValue;
+  if (changes.autoLockEnabled) settings.autoLock = changes.autoLockEnabled.newValue;
+  if (changes.lockTimeout) settings.timeout = changes.lockTimeout.newValue;
+  if (changes.blockNewChatShortcuts) settings.blockNewChatShortcuts = changes.blockNewChatShortcuts.newValue;
 });
 
 // --- 1. THE MAIN GEM BUTTON ---
@@ -65,14 +65,14 @@ function addMainGemButton() {
 
 // --- 2. PRIVACY VAULT LOGIC (RESTORED SNARK & STYLE) ---
 function applyPrivacyShield() {
-  if (!isLocked) return; 
+  if (!isLocked) return;
 
   // Selectors for the sidebar history area
-  const sidebar = document.querySelector('nav') || 
-                  document.querySelector('.flex-col.bg-bg-200') ||
-                  document.querySelector('[role="navigation"]') ||
-				  document.querySelector('.a2f3d50e');
-  
+  const sidebar = document.querySelector('nav') ||
+    document.querySelector('.flex-col.bg-bg-200') ||
+    document.querySelector('[role="navigation"]') ||
+    document.querySelector('.a2f3d50e');
+
   if (sidebar && !document.getElementById('gem-vault-overlay')) {
     const overlay = document.createElement('div');
     overlay.id = 'gem-vault-overlay';
@@ -90,8 +90,8 @@ function applyPrivacyShield() {
           </div>
         `;
     };
-	
-	    renderOverlay();
+
+    renderOverlay();
 
     // Re-render when sidebar collapses/expands
     const ro = new ResizeObserver(renderOverlay);
@@ -99,7 +99,7 @@ function applyPrivacyShield() {
 
     // Optional: store so we can disconnect later when unlocking
     overlay._vaultRO = ro;
-    
+
     Object.assign(overlay.style, {
       position: 'absolute', top: '0', left: '0', width: '100%', height: '100%',
       backgroundColor: 'rgba(5, 10, 20, 0.98)', backdropFilter: 'blur(30px)',
@@ -111,7 +111,12 @@ function applyPrivacyShield() {
       const entry = prompt("Identify yourself, Traveler:");
       if (entry?.toLowerCase() === settings.password) {
         isLocked = false;
-		overlay._vaultRO?.disconnect?.();
+        overlay._vaultRO?.disconnect?.();
+
+        // Restore original sidebar styles
+        if (sidebar._origOverflow !== undefined) sidebar.style.overflow = sidebar._origOverflow;
+        if (sidebar._origPosition !== undefined) sidebar.style.position = sidebar._origPosition;
+
         overlay.remove();
         lastActivity = Date.now();
       } else {
@@ -124,6 +129,10 @@ function applyPrivacyShield() {
         alert(insults[Math.floor(Math.random() * insults.length)]);
       }
     };
+
+    // Store original styles if not already stored
+    if (sidebar._origOverflow === undefined) sidebar._origOverflow = sidebar.style.overflow || "";
+    if (sidebar._origPosition === undefined) sidebar._origPosition = sidebar.style.position || "";
 
     sidebar.style.position = 'relative';
     sidebar.style.overflow = 'hidden';
@@ -172,7 +181,7 @@ function installVaultShortcutBlocker() {
   window.addEventListener('keydown', (e) => {
     if (!isLocked) return;
     if (e.repeat) return;
-	if (!settings.blockNewChatShortcuts) return;
+    if (!settings.blockNewChatShortcuts) return;
 
     const k = (e.key || '').toLowerCase();
     const host = location.hostname;
