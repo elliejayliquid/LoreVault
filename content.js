@@ -71,7 +71,8 @@ function applyPrivacyShield() {
   const sidebar = document.querySelector('nav') ||
     document.querySelector('.flex-col.bg-bg-200') ||
     document.querySelector('[role="navigation"]') ||
-    document.querySelector('.a2f3d50e');
+    document.querySelector('.a2f3d50e') ||
+    document.querySelector('[data-test-id="overflow-container"]');
 
   if (sidebar && !document.getElementById('gem-vault-overlay')) {
     const overlay = document.createElement('div');
@@ -198,6 +199,16 @@ function installVaultShortcutBlocker() {
 
     // ChatGPT: Ctrl+Shift+O
     if (/chatgpt\.com|chat\.openai\.com/i.test(host)) {
+      if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey && k === 'o') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return;
+      }
+    }
+
+    // Gemini: Ctrl+Shift+O
+    if (/gemini\.google\.com/i.test(host)) {
       if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey && k === 'o') {
         e.preventDefault();
         e.stopPropagation();
