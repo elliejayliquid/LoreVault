@@ -1,5 +1,5 @@
 # Lore Vault
-A Chrome privacy extension for popular LLM providers. Currently supports ChatGPT (OpenAI) and Claude (Anthropic).
+A Chrome privacy extension for popular LLM providers. Currently supports ChatGPT (OpenAI), Claude (Anthropic), DeepSeek, and Gemini.
 
 # A digital vault for your chat history. 
 Lore Vault locks your sidebar history with a password, optional auto-lock timer, and a clean “vault overlay” that hides your chat titles until you unlock.
@@ -25,4 +25,8 @@ Tired of minimizing your browser every time a coworker walks by? Lore Vault is a
 
 ## Built for dreamers, coders, and anyone avoiding the Sky Police 🚨
 
-<a href='https://ko-fi.com/V7V31EO2OL' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+##
+
+<div class="container", align="center">
+  <a href='https://ko-fi.com/V7V31EO2OL' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+</div>
