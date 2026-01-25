@@ -67,15 +67,43 @@ function addMainGemButton() {
 function applyPrivacyShield() {
   if (!isLocked) return;
 
-  // Selectors for the sidebar history area
-  const sidebar = document.getElementById('stage-slideover-sidebar') ||
-    document.querySelector('nav') ||
-    document.querySelector('.flex-col.bg-bg-200') ||
-    document.querySelector('[role="navigation"]') ||
-    document.querySelector('.a2f3d50e') ||
-    document.querySelector('[data-test-id="overflow-container"]');
+  const host = location.hostname;
+  let selectors = [];
 
-  if (sidebar && !document.getElementById('gem-vault-overlay')) {
+  // SITE-AWARE SELECTORS: Only use precise targets for each platform
+  if (/chatgpt\.com/i.test(host)) {
+    selectors = ['#stage-slideover-sidebar', 'nav'];
+  } else if (/x\.com|twitter\.com|grok\.com/i.test(host)) {
+    // Both navigation and projects
+    selectors = ['[data-sidebar="sidebar"]', '[data-panel][data-panel-id^="_r_"]', '[data-panel-id="r_dp"]'];
+  } else if (/gemini\.google\.com/i.test(host)) {
+    selectors = ['nav', '.flex-col.bg-bg-200', '[role="navigation"]'];
+  } else if (/claude\.ai/i.test(host)) {
+    selectors = ['nav', '[role="navigation"]'];
+  } else if (/deepseek\.com/i.test(host)) {
+    selectors = ['.a2f3d50e', '[data-test-id="overflow-container"]'];
+  } else {
+    // Fallback for unknown sites: be very conservative!
+    selectors = ['nav'];
+  }
+
+  // Find all matching sidebars
+  const sidebars = selectors
+    .flatMap(s => Array.from(document.querySelectorAll(s)))
+    .filter((el, index, self) => {
+      if (self.indexOf(el) !== index) return false;
+
+      // 🛡️ SAFETY CHECK: Sidebars are rarely more than 45% of screen width.
+      const rect = el.getBoundingClientRect();
+      if (rect.width > window.innerWidth * 0.45) return false;
+
+      return true;
+    });
+
+  sidebars.forEach(sidebar => {
+    // Skip if this specific sidebar already has an overlay
+    if (sidebar.querySelector(':scope > #gem-vault-overlay')) return;
+
     const overlay = document.createElement('div');
     overlay.id = 'gem-vault-overlay';
 
@@ -83,8 +111,9 @@ function applyPrivacyShield() {
       const w = sidebar.clientWidth;
       const compact = w < 110;
 
-      // By targeting the #stage-slideover-sidebar, we cover both expanded/collapsed 
-      // states and the 'New Chat' button without worrying about internal scrolls.
+      // Secondary sidebars (like Grok projects) get a minimal "stealth" shield
+      const isSecondary = sidebar.hasAttribute('data-panel');
+
       Object.assign(overlay.style, {
         position: 'absolute',
         top: '0',
@@ -94,23 +123,25 @@ function applyPrivacyShield() {
         zIndex: '9999'
       });
 
-      overlay.innerHTML = compact
-        ? `<div style="font-size:28px; filter: drop-shadow(0 0 10px #00d4ff);">💎</div>`
-        : `
-          <div style="padding:20px; font-family: 'Courier New', monospace; text-align: center;">
-            <div style="font-size: 30px; margin-bottom: 10px; filter: drop-shadow(0 0 10px #00d4ff);">💎</div>
-            <strong style="letter-spacing: 2px; display: block;">VAULT ACTIVE</strong>
-            <small style="font-size:10px; opacity:0.6; display: block; margin-top: 5px;">Pattern verification required</small>
-          </div>
-        `;
+      if (isSecondary) {
+        overlay.innerHTML = `<div style="font-size:18px; opacity: 0.3;">💎</div>`;
+      } else {
+        overlay.innerHTML = compact
+          ? `<div style="font-size:28px; filter: drop-shadow(0 0 10px #00d4ff);">💎</div>`
+          : `
+            <div style="padding:20px; font-family: 'Courier New', monospace; text-align: center;">
+              <div style="font-size: 30px; margin-bottom: 10px; filter: drop-shadow(0 0 10px #00d4ff);">💎</div>
+              <strong style="letter-spacing: 2px; display: block;">VAULT ACTIVE</strong>
+              <small style="font-size:10px; opacity:0.6; display: block; margin-top: 5px;">Pattern verification required</small>
+            </div>
+          `;
+      }
     };
 
     renderOverlay();
 
-    // Re-render when sidebar changes size (like toggling collapse)
     const ro = new ResizeObserver(renderOverlay);
     ro.observe(sidebar);
-
     overlay._vaultRO = ro;
 
     Object.assign(overlay.style, {
@@ -119,16 +150,23 @@ function applyPrivacyShield() {
       cursor: 'pointer'
     });
 
-    overlay.onclick = () => {
+    overlay.onclick = (e) => {
+      e.stopPropagation();
       const entry = prompt("Identify yourself, Traveler:");
       if (entry?.toLowerCase() === settings.password) {
         isLocked = false;
-        overlay._vaultRO?.disconnect?.();
 
-        // Restore original sidebar styles
-        if (sidebar._origOverflow !== undefined) sidebar.style.overflow = sidebar._origOverflow;
+        // GLOBAL UNLOCK: Remove all overlays on all sidebars
+        document.querySelectorAll('#gem-vault-overlay').forEach(ov => {
+          ov._vaultRO?.disconnect?.();
+          ov.remove();
+        });
 
-        overlay.remove();
+        // Restore original sidebar styles (for all matched sidebars)
+        sidebars.forEach(sb => {
+          if (sb._origOverflow !== undefined) sb.style.overflow = sb._origOverflow;
+        });
+
         lastActivity = Date.now();
       } else {
         const insults = [
@@ -143,10 +181,12 @@ function applyPrivacyShield() {
 
     // Store original styles
     if (sidebar._origOverflow === undefined) sidebar._origOverflow = sidebar.style.overflow || "";
+    if (sidebar._origPosition === undefined) sidebar._origPosition = sidebar.style.position || "";
 
+    sidebar.style.position = 'relative';
     sidebar.style.overflow = 'hidden';
     sidebar.appendChild(overlay);
-  }
+  });
 }
 
 // --- 2.5. KEYBOARD SHORTCUT (CTRL+SHIFT+L) ---
@@ -218,6 +258,16 @@ function installVaultShortcutBlocker() {
     // Gemini: Ctrl+Shift+O
     if (/gemini\.google\.com/i.test(host)) {
       if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey && k === 'o') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return;
+      }
+    }
+
+    // Grok: Ctrl+Shift+K (History)
+    if (/grok\.com/i.test(host)) {
+      if (e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey && k === 'k') {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();

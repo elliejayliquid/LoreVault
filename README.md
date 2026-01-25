@@ -1,5 +1,5 @@
 # Lore Vault
-A Chrome privacy extension for popular LLM providers. Currently supports ChatGPT (OpenAI), Claude (Anthropic), DeepSeek, and Gemini.
+A Chrome privacy extension for popular LLM providers. Currently supports ChatGPT (OpenAI), Claude (Anthropic), DeepSeek, Gemini, and Grok.
 
 # A digital vault for your chat history. 
 Lore Vault locks your sidebar history with a password, optional auto-lock timer, and a clean “vault overlay” that hides your chat titles until you unlock.

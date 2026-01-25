@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Lore Vault: Multi-Agent Edition",
-  "version": "1.1",
-  "description": "Privacy shield for ChatGPT, Claude, DeepSeek, and Gemini. Locks your chat history behind a secure vault.",
+  "version": "1.2",
+  "description": "Privacy shield for ChatGPT, Claude, DeepSeek, Gemini, and Grok. Locks your chat history behind a secure vault.",
   "permissions": [
     "storage"
   ],
@@ -16,7 +16,8 @@
         "https://chatgpt.com/*",
         "https://claude.ai/*",
         "https://chat.deepseek.com/*",
-        "https://gemini.google.com/*"
+        "https://gemini.google.com/*",
+        "https://grok.com/*"
       ],
       "js": [
         "content.js"
