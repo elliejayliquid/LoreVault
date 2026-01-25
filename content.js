@@ -68,7 +68,8 @@ function applyPrivacyShield() {
   if (!isLocked) return;
 
   // Selectors for the sidebar history area
-  const sidebar = document.querySelector('nav') ||
+  const sidebar = document.getElementById('stage-slideover-sidebar') ||
+    document.querySelector('nav') ||
     document.querySelector('.flex-col.bg-bg-200') ||
     document.querySelector('[role="navigation"]') ||
     document.querySelector('.a2f3d50e') ||
@@ -77,9 +78,21 @@ function applyPrivacyShield() {
   if (sidebar && !document.getElementById('gem-vault-overlay')) {
     const overlay = document.createElement('div');
     overlay.id = 'gem-vault-overlay';
+
     const renderOverlay = () => {
-      const w = sidebar.getBoundingClientRect().width;
-      const compact = w < 110; // tweak if needed
+      const w = sidebar.clientWidth;
+      const compact = w < 110;
+
+      // By targeting the #stage-slideover-sidebar, we cover both expanded/collapsed 
+      // states and the 'New Chat' button without worrying about internal scrolls.
+      Object.assign(overlay.style, {
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        zIndex: '9999'
+      });
 
       overlay.innerHTML = compact
         ? `<div style="font-size:28px; filter: drop-shadow(0 0 10px #00d4ff);">💎</div>`
@@ -94,18 +107,16 @@ function applyPrivacyShield() {
 
     renderOverlay();
 
-    // Re-render when sidebar collapses/expands
+    // Re-render when sidebar changes size (like toggling collapse)
     const ro = new ResizeObserver(renderOverlay);
     ro.observe(sidebar);
 
-    // Optional: store so we can disconnect later when unlocking
     overlay._vaultRO = ro;
 
     Object.assign(overlay.style, {
-      position: 'absolute', top: '0', left: '0', width: '100%', height: '100%',
       backgroundColor: 'rgba(5, 10, 20, 0.98)', backdropFilter: 'blur(30px)',
       color: '#00d4ff', display: 'flex', justifyContent: 'center', alignItems: 'center',
-      zIndex: '9999', cursor: 'pointer'
+      cursor: 'pointer'
     });
 
     overlay.onclick = () => {
@@ -116,7 +127,6 @@ function applyPrivacyShield() {
 
         // Restore original sidebar styles
         if (sidebar._origOverflow !== undefined) sidebar.style.overflow = sidebar._origOverflow;
-        if (sidebar._origPosition !== undefined) sidebar.style.position = sidebar._origPosition;
 
         overlay.remove();
         lastActivity = Date.now();
@@ -131,11 +141,9 @@ function applyPrivacyShield() {
       }
     };
 
-    // Store original styles if not already stored
+    // Store original styles
     if (sidebar._origOverflow === undefined) sidebar._origOverflow = sidebar.style.overflow || "";
-    if (sidebar._origPosition === undefined) sidebar._origPosition = sidebar.style.position || "";
 
-    sidebar.style.position = 'relative';
     sidebar.style.overflow = 'hidden';
     sidebar.appendChild(overlay);
   }
